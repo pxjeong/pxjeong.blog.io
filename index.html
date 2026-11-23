@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Px.의 정보보안, 개발 기록과 포트폴리오">
+  <meta name="theme-color" content="#0e0e0e">
+  <title>Px. · 기록의 수조</title>
+  <link rel="icon" href="./assets/favicon.png" type="image/png">
+  <link rel="stylesheet" href="./assets/style.css">
+  <script src="./assets/app.js" type="module"></script>
+</head>
+<body>
+  <header class="header">
+    <div class="shell header-inner">
+      <a class="brand" href="#home" aria-label="Px. 홈">Px<span class="brand-period">.</span></a>
+      <nav class="navigation" aria-label="주 메뉴">
+        <a href="#home" data-nav="home" aria-current="page">홈</a>
+        <a href="#posts" data-nav="posts">글</a>
+        <a href="#portfolio" data-nav="portfolio">포트폴리오</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="shell" id="home">
+    <section class="intro" aria-labelledby="page-title">
+      <h1 id="page-title">보안을 공부하고<br>기록합니다.</h1>
+      <dl class="intro-profile">
+        <div><dt>전공</dt><dd>정보보안공학과</dd></div>
+        <div><dt>글 원문</dt><dd><a href="https://pxjeong.tistory.com/">Tistory <span aria-hidden="true">↗</span></a></dd></div>
+      </dl>
+    </section>
+
+    <section class="aquarium" aria-labelledby="tank-title">
+      <div class="tank-heading">
+        <h2 id="tank-title">기록의 수조</h2>
+        <div class="tank-metrics">
+          <span class="tank-status" id="tank-status" hidden><span id="tank-mode"></span></span>
+          <span><strong id="fish-count">0</strong>마리</span>
+        </div>
+      </div>
+      <div class="tank-content">
+        <div class="tank">
+          <span class="seaweed seaweed-left" aria-hidden="true"><i>~~~</i><i>~~~~</i><i>~~</i></span>
+          <span class="seaweed seaweed-right" aria-hidden="true"><i>~~</i><i>~~~</i></span>
+          <canvas id="fish-canvas" tabindex="0" aria-label="수조 속 물고기" aria-describedby="tank-help tank-keys"></canvas>
+          <span id="tank-keys" class="visually-hidden">F 키를 누르면 물고기에게 먹이 한 알을 줍니다. 스페이스 키 또는 엔터 키를 누르면 물고기가 흩어집니다.</span>
+          <span class="tank-feedback" id="tank-feedback" role="status"></span>
+        </div>
+        <div class="tank-caption">
+          <p class="tank-help" id="tank-help">글 한 편에 한 마리. 먹이를 집어 물고기 입까지 끌어 보세요.</p>
+          <div class="tank-actions">
+            <span class="feed-count">먹이 <strong id="feed-count">0</strong>회</span>
+            <button type="button" class="feed-button" id="feed-button" disabled><span aria-hidden="true">+</span> 먹이 주기</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="archive-layout" id="posts">
+      <section aria-labelledby="topics-title">
+        <div class="section-heading">
+          <h2 id="topics-title">주제별 목차</h2>
+        </div>
+        <div class="topics" id="topics" aria-label="글 주제"></div>
+      </section>
+
+      <section aria-labelledby="posts-title">
+        <div class="section-heading">
+          <h2 id="posts-title">최근 글</h2>
+          <button type="button" class="text-button" id="all-posts" hidden>전체 글 보기 <span aria-hidden="true">↗</span></button>
+        </div>
+        <div class="posts-card">
+          <div id="post-list" aria-live="polite"><p class="empty-copy">글을 불러오는 중이에요.</p></div>
+          <button type="button" class="text-button more-button" id="more-posts" hidden>글 더 보기</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="portfolio" id="portfolio" aria-labelledby="portfolio-title">
+      <div class="section-heading"><h2 id="portfolio-title">포트폴리오</h2></div>
+      <div class="portfolio-card">
+        <div>
+          <h3>프로젝트와 작업 기록</h3>
+        </div>
+        <a class="portfolio-link" href="https://github.com/pxjeong">GitHub 프로필 <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell footer">
+    <a href="#home" class="footer-brand">Px<span>.</span></a>
+    <a href="https://pxjeong.tistory.com/">Tistory ↗</a>
+    <a href="https://github.com/pxjeong">GitHub ↗</a>
+  </footer>
+
+  <dialog class="post-dialog" id="post-dialog" aria-labelledby="post-dialog-title">
+    <div class="post-dialog-inner">
+      <button type="button" class="close-button" id="close-post" aria-label="글 닫기">×</button>
+      <p class="post-meta" id="post-dialog-meta"></p>
+      <h2 id="post-dialog-title"></h2>
+      <div class="post-body" id="post-dialog-body"></div>
+    </div>
+  </dialog>
+</body>
+</html>
