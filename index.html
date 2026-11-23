@@ -24,10 +24,14 @@
 
   <main class="shell" id="home">
     <section class="intro" aria-labelledby="page-title">
-      <h1 id="page-title">보안을 공부하고<br>기록합니다.</h1>
+      <div class="intro-name">
+        <h1 id="page-title">박세정</h1>
+        <p>Px.</p>
+      </div>
       <dl class="intro-profile">
-        <div><dt>전공</dt><dd>정보보안공학과</dd></div>
-        <div><dt>글 원문</dt><dd><a href="https://pxjeong.tistory.com/">Tistory <span aria-hidden="true">↗</span></a></dd></div>
+        <div><dt>나이</dt><dd>20 <span class="profile-detail">(2007.02.22 ~)</span></dd></div>
+        <div><dt>학교</dt><dd>상명대학교 <span class="profile-detail">정보보안공학과</span></dd></div>
+        <div><dt>동아리</dt><dd>Codecure</dd></div>
       </dl>
     </section>
 
@@ -41,18 +45,22 @@
       </div>
       <div class="tank-content">
         <div class="tank">
-          <span class="seaweed seaweed-left" aria-hidden="true"><i>~~~</i><i>~~~~</i><i>~~</i></span>
-          <span class="seaweed seaweed-right" aria-hidden="true"><i>~~</i><i>~~~</i></span>
+          <span class="seaweed seaweed-left" aria-hidden="true">
+            <span class="seaweed-stalk">~<br>~<br>~</span>
+            <span class="seaweed-stalk">~<br>~<br>~<br>~</span>
+            <span class="seaweed-stalk">~<br>~</span>
+          </span>
+          <span class="seaweed seaweed-right" aria-hidden="true">
+            <span class="seaweed-stalk">~<br>~</span>
+            <span class="seaweed-stalk">~<br>~<br>~</span>
+          </span>
           <canvas id="fish-canvas" tabindex="0" aria-label="수조 속 물고기" aria-describedby="tank-help tank-keys"></canvas>
           <span id="tank-keys" class="visually-hidden">F 키를 누르면 물고기에게 먹이 한 알을 줍니다. 스페이스 키 또는 엔터 키를 누르면 물고기가 흩어집니다.</span>
           <span class="tank-feedback" id="tank-feedback" role="status"></span>
         </div>
         <div class="tank-caption">
           <p class="tank-help" id="tank-help">글 한 편에 한 마리. 먹이를 집어 물고기 입까지 끌어 보세요.</p>
-          <div class="tank-actions">
-            <span class="feed-count">먹이 <strong id="feed-count">0</strong>회</span>
-            <button type="button" class="feed-button" id="feed-button" disabled><span aria-hidden="true">+</span> 먹이 주기</button>
-          </div>
+          <button type="button" class="feed-button" id="feed-button" disabled><span aria-hidden="true">+</span> 먹이 주기</button>
         </div>
       </div>
     </section>

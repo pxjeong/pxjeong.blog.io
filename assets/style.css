@@ -34,17 +34,17 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .intro { display: grid; grid-template-columns: 1fr minmax(0, .66fr); align-items: center; gap: var(--section-gap); padding: clamp(56px, 7.4vw, 106px) 0; }
 .intro h1 { font-size: clamp(38px, 5.4vw, 71px); font-weight: 730; letter-spacing: -.075em; line-height: 1.18; word-break: keep-all; }
+.intro-name p { margin-top: 12px; color: var(--muted); font-size: clamp(18px, 2vw, 24px); }
 .intro-profile { border-top: 1px solid var(--line); }
 .intro-profile div { display: grid; grid-template-columns: 76px 1fr; align-items: baseline; gap: 14px; padding: 17px 0; border-bottom: 1px solid var(--line); font-size: 15px; line-height: 1.5; }
 .intro-profile dt { color: var(--muted); font-size: 13px; }
-.intro-profile a:hover { text-decoration: underline; text-underline-offset: 3px; }
-.intro-profile a span { margin-left: 3px; color: var(--muted); }
+.profile-detail { color: var(--muted); font-size: .94em; }
 
 .aquarium, .archive-layout, .portfolio { display: grid; grid-template-columns: var(--section-columns); align-items: start; gap: var(--section-gap); padding: 42px 0; border-top: 1px solid var(--line); }
 .tank-heading { display: grid; gap: 10px; }
 .tank-heading h2, .section-heading h2 { font-size: 21px; font-weight: 720; letter-spacing: -.045em; }
-.tank-metrics, .tank-actions { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
-.tank-metrics strong, .feed-count strong { color: var(--ink); font-weight: 650; }
+.tank-metrics { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.tank-metrics strong { color: var(--ink); font-weight: 650; }
 .tank-status { padding-right: 10px; border-right: 1px solid var(--line); }
 
 .tank {
@@ -83,20 +83,19 @@ button, a { -webkit-tap-highlight-color: transparent; }
 #fish-canvas.is-over-food { cursor: grab; }
 #fish-canvas.is-dragging-food { cursor: grabbing; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.seaweed { position: absolute; bottom: 7px; width: 38px; height: 35px; pointer-events: none; }
+.seaweed { position: absolute; bottom: 10px; width: 66px; height: 64px; pointer-events: none; }
 .seaweed-left { left: 10%; }
 .seaweed-right { right: 12%; transform: scale(.8); transform-origin: bottom; }
-.seaweed i { position: absolute; left: 50%; bottom: -5px; color: #b0b0b0; font: 500 11px monospace; letter-spacing: -.18em; transform-origin: 0 50%; animation: sway 5s ease-in-out infinite alternate; }
-.seaweed i:nth-child(1) { --lean: -110deg; opacity: .57; }
-.seaweed i:nth-child(2) { --lean: -83deg; animation-delay: -2s; opacity: .76; }
-.seaweed i:nth-child(3) { --lean: -57deg; animation-delay: -3.5s; opacity: .55; }
-@keyframes sway { from { rotate: calc(var(--lean) - 7deg); } to { rotate: calc(var(--lean) + 7deg); } }
+.seaweed-stalk { position: absolute; bottom: 0; color: #c6c6c6; font: 700 25px/.53 ui-monospace, monospace; transform-origin: center bottom; animation: sway 5s ease-in-out infinite alternate; }
+.seaweed-stalk:nth-child(1) { left: 13px; --lean: -18deg; opacity: .65; }
+.seaweed-stalk:nth-child(2) { left: 28px; --lean: 3deg; animation-delay: -2s; opacity: .82; }
+.seaweed-stalk:nth-child(3) { left: 40px; --lean: 25deg; animation-delay: -3.5s; opacity: .57; }
+@keyframes sway { from { rotate: calc(var(--lean) - 5deg); } to { rotate: calc(var(--lean) + 5deg); } }
 .tank-feedback { position: absolute; right: 12px; bottom: 10px; max-width: 70%; padding: 5px 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font-size: 12px; overflow-wrap: anywhere; pointer-events: none; }
 .tank-feedback:empty { display: none; }
 .tank-caption { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 14px; }
 .tank-help { color: var(--muted); font-size: 13px; line-height: 1.6; word-break: keep-all; }
-.tank-actions { flex-shrink: 0; gap: 12px; }
-.feed-button { min-height: 32px; padding: 5px 10px; border: 1px solid var(--control-line); border-radius: 4px; background: transparent; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.feed-button { flex-shrink: 0; min-height: 32px; padding: 5px 10px; border: 1px solid var(--control-line); border-radius: 4px; background: transparent; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .feed-button:hover:enabled { border-color: var(--ink); background: #242424; }
 .feed-button span { margin-right: 2px; color: var(--muted); }
 
@@ -146,11 +145,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .aquarium, .archive-layout, .portfolio { grid-template-columns: 1fr; gap: 22px; padding: 27px 0; }
   .tank-heading { display: flex; align-items: baseline; justify-content: space-between; }
   .tank-caption { flex-wrap: wrap; gap: 8px 14px; }
-  .tank-actions { margin-left: auto; }
+  .feed-button { margin-left: auto; }
   .post-dialog-inner { padding: 24px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .seaweed i { animation: none; rotate: var(--lean); }
+  .seaweed-stalk { animation: none; rotate: var(--lean); }
 }

@@ -95,7 +95,6 @@ export function startAquarium(posts, categories) {
   const motion = matchMedia("(prefers-reduced-motion: reduce)");
   const feedButton = document.querySelector("#feed-button");
   const fishCount = document.querySelector("#fish-count");
-  const feedCount = document.querySelector("#feed-count");
   const feedback = document.querySelector("#tank-feedback");
   const tank = readTank();
   const food = [];
@@ -151,7 +150,6 @@ export function startAquarium(posts, categories) {
     feedButton.disabled = true;
     setTimeout(() => { feedButton.disabled = false; }, feedCooldown);
     tank.feeds += 1;
-    feedCount.textContent = tank.feeds;
     try {
       localStorage.setItem(storageKey, JSON.stringify(tank));
     } catch {
