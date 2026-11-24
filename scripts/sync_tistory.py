@@ -12,11 +12,12 @@ from urllib.parse import urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 import xml.etree.ElementTree as ET
 
+from article_content import clean_article
+
 BLOG_HOST = "pxjeong.tistory.com"
 FEED_URL = f"https://{BLOG_HOST}/rss"
 OUTPUT = Path(__file__).resolve().parent.parent / "data" / "tistory.json"
 MAX_FEED_BYTES = 8 * 1024 * 1024
-MAX_BODY_LENGTH = 16_000
 EXCERPT_LENGTH = 360
 
 CATEGORY_TERMS = {
@@ -124,7 +125,7 @@ def extract_posts(content):
             "category": post_category(item, title),
             "date": post_date(item.findtext("pubDate")),
             "excerpt": shorten(" ".join(body.split()), EXCERPT_LENGTH),
-            "body": shorten(body, MAX_BODY_LENGTH),
+            "html": clean_article(markup, url),
             "url": url,
         }
     if items and not posts:

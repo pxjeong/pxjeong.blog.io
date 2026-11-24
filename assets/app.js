@@ -32,7 +32,7 @@ function element(tag, className, text) {
 function postMeta(post) {
   const parts = [categoryById.get(post.category).name];
   if (post.date) parts.push(dateFormat.format(new Date(post.date)));
-  if (post.url) parts.push("티스토리 원문 ↗");
+  if (post.page) parts.push("Tistory");
   return parts.join(" · ");
 }
 
@@ -93,9 +93,9 @@ function renderPosts() {
   for (const post of posts.slice(0, visibleLimit)) {
     const article = element("article", "post-item");
     const heading = element("h3");
-    const entry = element(post.url ? "a" : "button", "post-link");
-    if (post.url) {
-      entry.href = post.url;
+    const entry = element(post.page ? "a" : "button", "post-link");
+    if (post.page) {
+      entry.href = new URL(`../${post.page}`, import.meta.url);
     } else {
       entry.type = "button";
       entry.addEventListener("click", () => showPost(post));
@@ -113,15 +113,15 @@ function parsePosts(raw, source) {
   if (!Array.isArray(raw)) throw new Error("Invalid post list");
   return raw.flatMap((entry) => {
     if (!entry || typeof entry.id !== "string" || !entry.id.trim() || typeof entry.title !== "string" || !entry.title.trim()) return [];
-    let url;
+    let page;
     if (source === "tistory") {
       try {
         const original = new URL(entry.url);
         if (original.protocol !== "https:" || original.hostname !== "pxjeong.tistory.com" || original.username || original.password || original.port) return [];
-        url = original.href;
       } catch {
         return [];
       }
+      if (typeof entry.page === "string" && /^posts\/[a-f0-9]{20}\.html$/.test(entry.page)) page = entry.page;
     }
     const body = typeof entry.body === "string" ? entry.body : "";
     const excerpt = typeof entry.excerpt === "string" ? entry.excerpt : body.slice(0, 160);
@@ -129,7 +129,7 @@ function parsePosts(raw, source) {
       id: `${source}:${entry.id}`, title: entry.title,
       category: categoryById.has(entry.category) ? entry.category : "docs",
       date: typeof entry.date === "string" && Number.isFinite(Date.parse(entry.date)) ? entry.date : "",
-      excerpt, body, url,
+      excerpt, body, page,
     }];
   });
 }
