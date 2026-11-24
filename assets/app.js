@@ -32,7 +32,7 @@ function element(tag, className, text) {
 function postMeta(post) {
   const parts = [categoryById.get(post.category).name];
   if (post.date) parts.push(dateFormat.format(new Date(post.date)));
-  if (post.url) parts.push("Tistory");
+  if (post.url) parts.push("티스토리 원문 ↗");
   return parts.join(" · ");
 }
 
@@ -43,11 +43,6 @@ function showPost(post) {
   body.replaceChildren();
   const content = post.body || post.excerpt;
   if (content) body.append(element("p", "", content));
-  if (post.url) {
-    const link = element("a", "", "티스토리에서 원문 보기 ↗");
-    link.href = post.url;
-    body.append(link);
-  }
   dialog.showModal();
 }
 
@@ -98,12 +93,16 @@ function renderPosts() {
   for (const post of posts.slice(0, visibleLimit)) {
     const article = element("article", "post-item");
     const heading = element("h3");
-    const button = element("button", "post-link");
-    button.type = "button";
-    button.append(element("span", "post-meta", postMeta(post)), element("span", "post-title", post.title));
-    if (post.excerpt) button.append(element("span", "post-excerpt", post.excerpt));
-    button.addEventListener("click", () => showPost(post));
-    heading.append(button);
+    const entry = element(post.url ? "a" : "button", "post-link");
+    if (post.url) {
+      entry.href = post.url;
+    } else {
+      entry.type = "button";
+      entry.addEventListener("click", () => showPost(post));
+    }
+    entry.append(element("span", "post-meta", postMeta(post)), element("span", "post-title", post.title));
+    if (post.excerpt) entry.append(element("span", "post-excerpt", post.excerpt));
+    heading.append(entry);
     article.append(heading);
     fragment.append(article);
   }
