@@ -135,17 +135,28 @@ def mirror_images(entries, output, cache):
     return mirrored, len(sources)
 
 
-def render_article(post, images):
+def article_navigation(older, newer):
+    links = []
+    if older:
+        links.append(f'<a rel="prev" href="{Path(older["page"]).name}"><span>← 이전 글</span>{escape(older["title"])}</a>')
+    if newer:
+        links.append(f'<a rel="next" href="{Path(newer["page"]).name}"><span>다음 글 →</span>{escape(newer["title"])}</a>')
+    return '<nav class="reader-neighbors" aria-label="다른 기록">' + "".join(links) + "</nav>" if links else ""
+
+
+def render_article(post, images, older, newer):
     title = escape(post["title"])
     url = escape(post["url"], quote=True)
     description = escape(post.get("excerpt", ""), quote=True)
     date = escape(post.get("date", "")[:10])
     category = escape(CATEGORY_NAMES.get(post.get("category"), CATEGORY_NAMES["docs"]))
-    metadata = f"<span>{category}</span>" + (f'<time datetime="{date}">{date}</time>' if date else "")
+    date_label = date.replace("-", ".")
+    metadata = (f'<time datetime="{date}">{date_label}</time>' if date else "") + f"<span>{category}</span>"
     fallback = post.get("body") or post.get("excerpt") or ""
     body = clean_article(post["html"], post["url"], images) if post.get("html") else (
         f'<p class="plain-article">{escape(fallback)}</p>'
     )
+    navigation = article_navigation(older, newer)
     return f"""<!doctype html>
 <html lang="ko">
 <head>
@@ -153,7 +164,7 @@ def render_article(post, images):
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="{description}">
   <meta name="theme-color" content="#0e0e0e">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' https:; media-src https:; object-src 'none'; base-uri 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https:; media-src https:; object-src 'none'; base-uri 'none'">
   <title>{title} · Px.</title>
   <link rel="icon" href="../assets/favicon.png" type="image/png">
   <link rel="stylesheet" href="../assets/style.css">
@@ -162,17 +173,25 @@ def render_article(post, images):
   <header class="header">
     <div class="shell header-inner">
       <a class="brand" href="../" aria-label="Px. 홈">Px.</a>
-      <nav class="navigation" aria-label="주 메뉴"><a href="../#posts">← 글 목록</a></nav>
+      <nav class="navigation" aria-label="주 메뉴">
+        <a href="../">홈</a>
+        <a href="../#posts" aria-current="true">글</a>
+        <a href="../#portfolio">포트폴리오</a>
+      </nav>
     </div>
   </header>
   <main class="shell">
     <article class="reader">
+      <a class="reader-back" href="../#posts">← 전체 기록</a>
       <header class="reader-heading">
         <p class="reader-meta">{metadata}</p>
         <h1>{title}</h1>
       </header>
       <div class="article-content">{body}</div>
-      <footer class="reader-footer"><a href="{url}">티스토리 원문 ↗</a></footer>
+      <footer class="reader-footer">
+        <a href="{url}">티스토리 원문 ↗</a>
+        {navigation}
+      </footer>
     </article>
   </main>
 </body>
@@ -202,10 +221,13 @@ def build_site(output, cache, skip_media, require_media):
     index = []
     for post in posts:
         slug = sha256(post["url"].encode()).hexdigest()[:20] + ".html"
-        (pages / slug).write_text(render_article(post, images), encoding="utf-8")
         index.append({key: post.get(key, "") for key in ("id", "title", "category", "date", "excerpt", "url")} | {
             "page": "posts/" + slug,
         })
+    for offset, (post, entry) in enumerate(zip(posts, index)):
+        older = index[offset + 1] if offset + 1 < len(index) else None
+        newer = index[offset - 1] if offset else None
+        (output / entry["page"]).write_text(render_article(post, images, older, newer), encoding="utf-8")
     (data / "tistory.json").write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Built {len(index)} full article pages in {output}")
 
