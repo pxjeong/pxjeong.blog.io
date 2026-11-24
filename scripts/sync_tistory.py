@@ -1,6 +1,7 @@
 """Keep a static archive of the public Tistory RSS feed for GitHub Pages."""
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 from email.utils import parsedate_to_datetime
 from html import unescape
 from html.parser import HTMLParser
@@ -8,8 +9,9 @@ import json
 from pathlib import Path
 import re
 from tempfile import NamedTemporaryFile
+from urllib.error import HTTPError
 from urllib.parse import urlsplit, urlunsplit
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener, urlopen
 import xml.etree.ElementTree as ET
 
 from article_content import clean_article
@@ -19,6 +21,7 @@ FEED_URL = f"https://{BLOG_HOST}/rss"
 OUTPUT = Path(__file__).resolve().parent.parent / "data" / "tistory.json"
 MAX_FEED_BYTES = 8 * 1024 * 1024
 EXCERPT_LENGTH = 360
+USER_AGENT = "pxjeong-blog-rss-sync/1.0"
 
 CATEGORY_TERMS = {
     "ctf": ("ctf", "wargame", "war game", "워게임", "드림핵", "pwn", "리버싱"),
@@ -134,7 +137,7 @@ def extract_posts(content):
 
 
 def download_feed():
-    request = Request(FEED_URL, headers={"User-Agent": "pxjeong-blog-rss-sync/1.0", "Accept": "application/rss+xml, application/xml, text/xml"})
+    request = Request(FEED_URL, headers={"User-Agent": USER_AGENT, "Accept": "application/rss+xml, application/xml, text/xml"})
     with urlopen(request, timeout=20) as response:
         if urlsplit(response.geturl()).hostname != BLOG_HOST:
             raise ValueError("RSS redirected outside the Tistory blog")
@@ -144,13 +147,44 @@ def download_feed():
     return content
 
 
-def update_archive(content, output):
+class NoRedirects(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def original_is_gone(url):
+    if not isinstance(url, str) or not url or canonical_link(url) != url:
+        return None
+    request = Request(url, headers={"User-Agent": USER_AGENT, "Cache-Control": "no-cache"})
+    try:
+        with build_opener(NoRedirects).open(request, timeout=10):
+            return False
+    except HTTPError as error:
+        with error:
+            return True if error.code in {404, 410} else None
+    except (OSError, ValueError):
+        return None
+
+
+def update_archive(content, output, *, check_removals=False):
     existing = json.loads(output.read_text(encoding="utf-8")) if output.exists() else []
     if not isinstance(existing, list):
         raise ValueError("Expected a list in the RSS archive")
     previous = {entry["id"]: entry for entry in existing}
     fresh = extract_posts(content)
     merged = previous | fresh
+    removed = 0
+    unverified = 0
+    missing = tuple(previous.keys() - fresh.keys())
+    if check_removals and missing:
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            results = pool.map(original_is_gone, (previous[post_id].get("url") for post_id in missing))
+            for post_id, is_gone in zip(missing, results):
+                if is_gone is True:
+                    del merged[post_id]
+                    removed += 1
+                elif is_gone is None:
+                    unverified += 1
     if previous != merged:
         entries = sorted(merged.values(), key=lambda post: (post["date"], post["id"]), reverse=True)
         with NamedTemporaryFile(mode="w", encoding="utf-8", dir=output.parent, delete=False) as file:
@@ -158,7 +192,10 @@ def update_archive(content, output):
             json.dump(entries, file, ensure_ascii=False, indent=2)
             file.write("\n")
         temporary.replace(output)
-    print(f"RSS: {len(fresh)} entries read, {len(merged) - len(previous)} added, {len(merged)} archived")
+    added = len(fresh.keys() - previous.keys())
+    print(f"RSS: {len(fresh)} entries read, {added} added, {removed} removed, {len(merged)} archived")
+    if unverified:
+        print(f"Kept {unverified} archived posts whose status could not be verified")
 
 
 def main():
@@ -167,7 +204,7 @@ def main():
     parser.add_argument("--output", type=Path, default=OUTPUT)
     args = parser.parse_args()
     content = args.feed_file.read_bytes() if args.feed_file else download_feed()
-    update_archive(content, args.output)
+    update_archive(content, args.output, check_removals=args.feed_file is None)
 
 
 if __name__ == "__main__":

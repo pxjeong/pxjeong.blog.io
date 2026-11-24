@@ -19,10 +19,6 @@ const spriteHeight = 26;
 const spriteResolution = 3;
 const mouthOffset = 17;
 const maxPellets = 24;
-const previewSwimmers = [
-  [.23, .41], [.42, .60], [.62, .35], [.72, .57],
-  [.83, .42], [.27, .72], [.56, .77], [.79, .74], [.38, .28],
-];
 
 function readTank() {
   try {
@@ -108,17 +104,8 @@ export function startAquarium(posts, categories) {
   const spriteCache = new Map();
   let drag = null;
 
-  const isPreview = !posts.length;
-  const swimmers = isPreview
-    ? previewSwimmers.map((_, index) => ({ id: `preview-${index}`, category: categories[index % categories.length].id }))
-    : posts;
-
-  if (isPreview) {
-    document.querySelector("#tank-mode").textContent = "미리보기";
-    document.querySelector("#tank-status").hidden = false;
-  }
-  fishCount.textContent = swimmers.length;
-  const fish = swimmers.map((post, index) => {
+  fishCount.textContent = posts.length;
+  const fish = posts.map((post) => {
     const random = randomFor(post.id);
     const { color } = categories.find((category) => category.id === post.category);
     const language = fishCode[Math.floor(random() * fishCode.length)];
@@ -127,7 +114,8 @@ export function startAquarium(posts, categories) {
       const frames = (direction) => tailFrames.map((offset) => makeFishSprite(color, language, offset, direction));
       spriteCache.set(key, { [-1]: frames(-1), 1: frames(1) });
     }
-    const [xRatio, yRatio] = isPreview ? previewSwimmers[index] : [.12 + random() * .76, .22 + random() * .59];
+    const xRatio = .12 + random() * .76;
+    const yRatio = .22 + random() * .59;
     if (!Number.isSafeInteger(tank.births[post.id])) tank.births[post.id] = tank.feeds;
     return {
       xRatio, yRatio, x: 0, y: 0, sprites: spriteCache.get(key), language: language.name, title: post.title,
@@ -320,7 +308,7 @@ export function startAquarium(posts, categories) {
     swimmer.burst = 1;
     if (motion.matches) swimmer.x = Math.max(23, Math.min(width - 23, swimmer.x + swimmer.direction * 12));
     requestDraw();
-    notify(swimmer.title ? `${swimmer.language} 물고기 · ${swimmer.title}` : `${swimmer.language} 물고기가 헤엄쳤어요!`);
+    notify(`${swimmer.language} 물고기 · ${swimmer.title}`);
   });
   for (const eventName of ["pointerup", "pointercancel", "lostpointercapture"]) {
     canvas.addEventListener(eventName, (event) => {
@@ -329,7 +317,7 @@ export function startAquarium(posts, categories) {
   }
   canvas.addEventListener("pointerleave", () => canvas.classList.remove("is-over-food", "is-over-fish"));
   canvas.addEventListener("keydown", (event) => {
-    if (event.repeat) return;
+    if (event.repeat || !fish.length) return;
     if (event.key.toLowerCase() === "f" && food.length && !drag) {
       const pellet = food[0];
       const swimmer = fish.reduce((closest, candidate) =>

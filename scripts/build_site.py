@@ -8,6 +8,7 @@ from html.parser import HTMLParser
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 from tempfile import TemporaryDirectory
 from urllib.parse import urlsplit
@@ -228,7 +229,14 @@ def build_site(output, cache, skip_media, require_media):
         older = index[offset + 1] if offset + 1 < len(index) else None
         newer = index[offset - 1] if offset else None
         (output / entry["page"]).write_text(render_article(post, images, older, newer), encoding="utf-8")
-    (data / "tistory.json").write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    index_path = data / "tistory.json"
+    if index_path.is_file():
+        active_pages = {post["page"] for post in index}
+        for entry in json.loads(index_path.read_text(encoding="utf-8")):
+            page = entry.get("page", "")
+            if re.fullmatch(r"posts/[a-f0-9]{20}\.html", page) and page not in active_pages:
+                (output / page).unlink(missing_ok=True)
+    index_path.write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Built {len(index)} full article pages in {output}")
 
 

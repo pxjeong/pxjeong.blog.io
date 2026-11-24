@@ -135,7 +135,7 @@ function parsePosts(raw, source) {
 }
 
 async function loadPosts(path, source) {
-  const response = await fetch(new URL(path, import.meta.url));
+  const response = await fetch(new URL(path, import.meta.url), { cache: "no-cache" });
   if (!response.ok) throw new Error(`Could not load ${source} posts`);
   return parsePosts(await response.json(), source);
 }

@@ -45,7 +45,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .tank-heading h2, .section-heading h2 { font-size: 21px; font-weight: 720; letter-spacing: -.045em; }
 .tank-metrics { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
 .tank-metrics strong { color: var(--ink); font-weight: 650; }
-.tank-status { padding-right: 10px; border-right: 1px solid var(--line); }
 
 .tank {
   position: relative;
