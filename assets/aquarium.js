@@ -1,5 +1,6 @@
-const storageKey = "pxjeong-aquarium-v1";
-const maxGrowthFeeds = 42;
+const baseFishSize = .86;
+const maxViewGrowth = .25;
+const viewsForMaxSize = 1000;
 const feedCooldown = 1250;
 const tailFrames = [-2, -1, 0, 1, 2];
 const fishCode = [
@@ -20,16 +21,9 @@ const spriteResolution = 3;
 const mouthOffset = 17;
 const maxPellets = 24;
 
-function readTank() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(storageKey));
-    if (Number.isSafeInteger(saved?.feeds) && saved.feeds >= 0) {
-      return { feeds: saved.feeds, births: Object.assign(Object.create(null), saved.births) };
-    }
-  } catch {
-    // The tank still works when the browser blocks storage.
-  }
-  return { feeds: 0, births: Object.create(null) };
+function fishSize(views = 0) {
+  const progress = Math.min(1, Math.log1p(views) / Math.log1p(viewsForMaxSize));
+  return baseFishSize * (1 + maxViewGrowth * progress);
 }
 
 function randomFor(value) {
@@ -92,7 +86,6 @@ export function startAquarium(posts, categories) {
   const feedButton = document.querySelector("#feed-button");
   const fishCount = document.querySelector("#fish-count");
   const feedback = document.querySelector("#tank-feedback");
-  const tank = readTank();
   const food = [];
   const now = performance.now();
   let lastFeed = -Infinity;
@@ -116,12 +109,10 @@ export function startAquarium(posts, categories) {
     }
     const xRatio = .12 + random() * .76;
     const yRatio = .22 + random() * .59;
-    if (!Number.isSafeInteger(tank.births[post.id])) tank.births[post.id] = tank.feeds;
     return {
       xRatio, yRatio, x: 0, y: 0, sprites: spriteCache.get(key), language: language.name, title: post.title,
       direction: random() < .5 ? -1 : 1, phase: random() * Math.PI * 2,
-      speed: 12 + random() * 17, baseSize: .73 + random() * .23,
-      birth: tank.births[post.id], burst: 0, rise: 0, size: 1,
+      speed: 12 + random() * 17, burst: 0, rise: 0, size: fishSize(post.views),
     };
   });
 
@@ -137,12 +128,6 @@ export function startAquarium(posts, categories) {
     lastFeed = time;
     feedButton.disabled = true;
     setTimeout(() => { feedButton.disabled = false; }, feedCooldown);
-    tank.feeds += 1;
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(tank));
-    } catch {
-      // Growth for this visit still works.
-    }
     const center = width * (.39 + Math.random() * .22);
     const spacing = Math.min(width * .115, 37);
     for (let index = 0; index < 5; index += 1) {
@@ -233,8 +218,6 @@ export function startAquarium(posts, categories) {
 
     for (const swimmer of fish) {
       if (!still) advanceFish(swimmer, dt, elapsed);
-      const age = Math.min(maxGrowthFeeds, Math.max(0, tank.feeds - swimmer.birth));
-      swimmer.size = swimmer.baseSize * (1 + age * .006);
       drawFish(ctx, swimmer, elapsed, still);
     }
     checkBite();

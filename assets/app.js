@@ -125,11 +125,12 @@ function parsePosts(raw, source) {
     }
     const body = typeof entry.body === "string" ? entry.body : "";
     const excerpt = typeof entry.excerpt === "string" ? entry.excerpt : body.slice(0, 160);
+    const views = source === "tistory" && Number.isSafeInteger(entry.views) && entry.views >= 0 ? entry.views : 0;
     return [{
       id: `${source}:${entry.id}`, title: entry.title,
       category: categoryById.has(entry.category) ? entry.category : "docs",
       date: typeof entry.date === "string" && Number.isFinite(Date.parse(entry.date)) ? entry.date : "",
-      excerpt, body, page,
+      excerpt, body, page, views,
     }];
   });
 }

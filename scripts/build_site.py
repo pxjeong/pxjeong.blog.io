@@ -209,6 +209,12 @@ def build_site(output, cache, skip_media, require_media):
     shutil.copyfile(ROOT / "data" / "posts.json", data / "posts.json")
     entries = json.loads((ROOT / "data" / "tistory.json").read_text(encoding="utf-8"))
     posts = [entry for entry in entries if canonical_link(entry.get("url", "")) == entry.get("url")]
+    view_counts = json.loads((ROOT / "data" / "tistory-views.json").read_text(encoding="utf-8"))
+    if not isinstance(view_counts, dict) or any(
+        canonical_link(url) != url or not url or type(count) is not int or not 0 <= count <= 2**53 - 1
+        for url, count in view_counts.items()
+    ):
+        raise ValueError("Expected Tistory post URLs with nonnegative integer view counts")
     images, expected = ({}, 0) if skip_media else mirror_images(posts, output, cache)
     image_report = f"Copied {len(images)} of {expected} Tistory images"
     print(image_report)
@@ -221,10 +227,14 @@ def build_site(output, cache, skip_media, require_media):
     pages.mkdir(exist_ok=True)
     index = []
     for post in posts:
-        slug = sha256(post["url"].encode()).hexdigest()[:20] + ".html"
-        index.append({key: post.get(key, "") for key in ("id", "title", "category", "date", "excerpt", "url")} | {
+        url = post["url"]
+        slug = sha256(url.encode()).hexdigest()[:20] + ".html"
+        entry = {key: post.get(key, "") for key in ("id", "title", "category", "date", "excerpt", "url")} | {
             "page": "posts/" + slug,
-        })
+        }
+        if url in view_counts:
+            entry["views"] = view_counts[url]
+        index.append(entry)
     for offset, (post, entry) in enumerate(zip(posts, index)):
         older = index[offset + 1] if offset + 1 < len(index) else None
         newer = index[offset - 1] if offset else None

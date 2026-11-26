@@ -53,12 +53,15 @@
             <span class="seaweed-stalk">~<br>~</span>
             <span class="seaweed-stalk">~<br>~<br>~</span>
           </span>
-          <canvas id="fish-canvas" tabindex="0" aria-label="수조 속 물고기" aria-describedby="tank-help tank-keys"></canvas>
+          <canvas id="fish-canvas" tabindex="0" aria-label="수조 속 물고기" aria-describedby="tank-help tank-sizing tank-keys"></canvas>
           <span id="tank-keys" class="visually-hidden">F 키를 누르면 물고기에게 먹이 한 알을 줍니다. 스페이스 키 또는 엔터 키를 누르면 물고기가 흩어집니다.</span>
           <span class="tank-feedback" id="tank-feedback" role="status"></span>
         </div>
         <div class="tank-caption">
-          <p class="tank-help" id="tank-help">글 한 편에 한 마리. 먹이를 집어 물고기 입까지 끌어 보세요.</p>
+          <div class="tank-instructions">
+            <p id="tank-help">글 한 편에 한 마리. 먹이를 집어 물고기 입까지 끌어 보세요.</p>
+            <p id="tank-sizing">기록된 티스토리 조회수가 많을수록 물고기가 조금 더 커져요. 조회수 정보가 없는 글은 기본 크기로 표시돼요.</p>
+          </div>
           <button type="button" class="feed-button" id="feed-button" disabled><span aria-hidden="true">+</span> 먹이 주기</button>
         </div>
       </div>
