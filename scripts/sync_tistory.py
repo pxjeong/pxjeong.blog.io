@@ -23,6 +23,7 @@ MAX_FEED_BYTES = 8 * 1024 * 1024
 EXCERPT_LENGTH = 360
 USER_AGENT = "pxjeong-blog-rss-sync/1.0"
 
+CATEGORY_OVERRIDES = {f"https://{BLOG_HOST}/10": "dev"}
 CATEGORY_TERMS = {
     "ctf": ("ctf", "wargame", "war game", "워게임", "드림핵", "pwn", "리버싱"),
     "bounty": ("bug bounty", "bugbounty", "버그바운티", "버그 바운티"),
@@ -125,7 +126,7 @@ def extract_posts(content):
         posts[url] = {
             "id": url,
             "title": title,
-            "category": post_category(item, title),
+            "category": CATEGORY_OVERRIDES.get(url) or post_category(item, title),
             "date": post_date(item.findtext("pubDate")),
             "excerpt": shorten(" ".join(body.split()), EXCERPT_LENGTH),
             "html": clean_article(markup, url),
