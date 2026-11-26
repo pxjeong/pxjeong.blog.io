@@ -141,7 +141,7 @@ async function loadPosts(path, source) {
 }
 
 function updateNavigation() {
-  const route = ["posts", "portfolio"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "home";
+  const route = ["posts", "experience"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "home";
   for (const link of document.querySelectorAll("[data-nav]")) {
     if (link.dataset.nav === route) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");

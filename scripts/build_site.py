@@ -177,7 +177,7 @@ def render_article(post, images, older, newer):
       <nav class="navigation" aria-label="주 메뉴">
         <a href="../">홈</a>
         <a href="../#posts" aria-current="true">글</a>
-        <a href="../#portfolio">포트폴리오</a>
+        <a href="../#experience">경험</a>
       </nav>
     </div>
   </header>
