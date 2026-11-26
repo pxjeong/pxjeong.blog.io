@@ -48,7 +48,7 @@ GitHub에서 직접 글을 쓰려면 `data/posts.json`에 항목을 추가하세
 | `research` | 논문/컨퍼런스 |
 | `awards` | 공모전/자격증 |
 
-연도별 경험은 `index.html`의 `experience` 섹션에서 수정할 수 있습니다.
+연도별 경험과 대회 기록은 `index.html`의 `experience`와 `ctf` 섹션에서 수정할 수 있습니다.
 
 ## 물고기 크기
 

@@ -178,6 +178,7 @@ def render_article(post, images, older, newer):
         <a href="../">홈</a>
         <a href="../#posts" aria-current="true">글</a>
         <a href="../#experience">경험</a>
+        <a href="../#ctf">CTF</a>
       </nav>
     </div>
   </header>
