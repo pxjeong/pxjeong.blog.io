@@ -23,7 +23,10 @@ MAX_FEED_BYTES = 8 * 1024 * 1024
 EXCERPT_LENGTH = 360
 USER_AGENT = "pxjeong-blog-rss-sync/1.0"
 
-CATEGORY_OVERRIDES = {f"https://{BLOG_HOST}/10": "dev"}
+CATEGORY_OVERRIDES = {
+    f"https://{BLOG_HOST}/10": "docs",
+    f"https://{BLOG_HOST}/11": "dev",
+}
 CATEGORY_TERMS = {
     "ctf": ("ctf", "wargame", "war game", "워게임", "드림핵", "pwn", "리버싱"),
     "bounty": ("bug bounty", "bugbounty", "버그바운티", "버그 바운티"),
